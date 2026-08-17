@@ -46,7 +46,12 @@ Route::middleware('auth')->group(function () {
 
 
 
-Route::post('/mystery-cases', [MysteryCaseController::class, 'store']);
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::post('/mystery-cases', [
+        MysteryCaseController::class,
+        'store',
+    ]);
+});
 
 
 
