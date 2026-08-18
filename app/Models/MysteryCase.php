@@ -25,4 +25,9 @@ class MysteryCase extends Model
         return $this->hasMany(Clue::class);
     }
 
+    public function evidence(): HasMany
+    {
+        return $this->hasMany(Evidence::class);
+    }
+
 }
