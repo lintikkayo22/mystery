@@ -458,4 +458,178 @@ class MysteryCaseTest extends TestCase
         ]);
     }
 
+    public function test_admin_can_publish_draft_mystery_case(): void
+    {
+        $adminRole = Role::where('name', 'admin')->firstOrFail();
+
+        $admin = User::factory()->create([
+            'role_id' => $adminRole->id,
+        ]);
+
+        $mysteryCase = MysteryCase::factory()->create([
+            'status' => 'draft',
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->post("/mystery-cases/{$mysteryCase->id}/publish");
+
+        $response->assertOk();
+
+        $this->assertDatabaseHas('mystery_cases', [
+            'id' => $mysteryCase->id,
+            'status' => 'published',
+        ]);
+    }
+
+    public function test_investigator_cannot_publish_mystery_case(): void
+    {
+        $investigatorRole = Role::where('name', 'investigator')->firstOrFail();
+
+        $investigator = User::factory()->create([
+            'role_id' => $investigatorRole->id,
+        ]);
+
+        $mysteryCase = MysteryCase::factory()->create([
+            'status' => 'draft',
+        ]);
+
+        $response = $this->actingAs($investigator)
+            ->post("/mystery-cases/{$mysteryCase->id}/publish");
+
+        $response->assertForbidden();
+
+        $this->assertDatabaseHas('mystery_cases', [
+            'id' => $mysteryCase->id,
+            'status' => 'draft',
+        ]);
+    }
+
+    public function test_admin_cannot_publish_already_published_mystery_case(): void
+    {
+        $adminRole = Role::where('name', 'admin')->firstOrFail();
+
+        $admin = User::factory()->create([
+            'role_id' => $adminRole->id,
+        ]);
+
+        $mysteryCase = MysteryCase::factory()->published()->create();
+
+        $response = $this->actingAs($admin)
+            ->post("/mystery-cases/{$mysteryCase->id}/publish");
+
+        $response->assertForbidden();
+
+        $this->assertDatabaseHas('mystery_cases', [
+            'id' => $mysteryCase->id,
+            'status' => 'published',
+        ]);
+    }
+
+    public function test_admin_cannot_publish_archived_mystery_case(): void
+    {
+        $adminRole = Role::where('name', 'admin')->firstOrFail();
+
+        $admin = User::factory()->create([
+            'role_id' => $adminRole->id,
+        ]);
+
+        $mysteryCase = MysteryCase::factory()->archived()->create();
+
+        $response = $this->actingAs($admin)
+            ->post("/mystery-cases/{$mysteryCase->id}/publish");
+
+        $response->assertForbidden();
+
+        $this->assertDatabaseHas('mystery_cases', [
+            'id' => $mysteryCase->id,
+            'status' => 'archived',
+        ]);
+    }
+
+    public function test_admin_can_archive_published_mystery_case(): void
+    {
+        $adminRole = Role::where('name', 'admin')->firstOrFail();
+
+        $admin = User::factory()->create([
+            'role_id' => $adminRole->id,
+        ]);
+
+        $mysteryCase = MysteryCase::factory()->published()->create();
+
+        $response = $this->actingAs($admin)
+            ->post("/mystery-cases/{$mysteryCase->id}/archive");
+
+        $response->assertOk();
+
+        $this->assertDatabaseHas('mystery_cases', [
+            'id' => $mysteryCase->id,
+            'status' => 'archived',
+        ]);
+    }
+
+    public function test_investigator_cannot_archive_mystery_case(): void
+    {
+        $investigatorRole = Role::where('name', 'investigator')->firstOrFail();
+
+        $investigator = User::factory()->create([
+            'role_id' => $investigatorRole->id,
+        ]);
+
+        $mysteryCase = MysteryCase::factory()->published()->create();
+
+        $response = $this->actingAs($investigator)
+            ->post("/mystery-cases/{$mysteryCase->id}/archive");
+
+        $response->assertForbidden();
+
+        $this->assertDatabaseHas('mystery_cases', [
+            'id' => $mysteryCase->id,
+            'status' => 'published',
+        ]);
+    }
+
+    public function test_admin_cannot_archive_draft_mystery_case(): void
+    {
+        $adminRole = Role::where('name', 'admin')->firstOrFail();
+
+        $admin = User::factory()->create([
+            'role_id' => $adminRole->id,
+        ]);
+
+        $mysteryCase = MysteryCase::factory()->create([
+            'status' => 'draft',
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->post("/mystery-cases/{$mysteryCase->id}/archive");
+
+        $response->assertForbidden();
+
+        $this->assertDatabaseHas('mystery_cases', [
+            'id' => $mysteryCase->id,
+            'status' => 'draft',
+        ]);
+    }
+
+    public function test_admin_cannot_archive_already_archived_mystery_case(): void
+    {
+        $adminRole = Role::where('name', 'admin')->firstOrFail();
+
+        $admin = User::factory()->create([
+            'role_id' => $adminRole->id,
+        ]);
+
+        $mysteryCase = MysteryCase::factory()->archived()->create();
+
+        $response = $this->actingAs($admin)
+            ->post("/mystery-cases/{$mysteryCase->id}/archive");
+
+        $response->assertForbidden();
+
+        $this->assertDatabaseHas('mystery_cases', [
+            'id' => $mysteryCase->id,
+            'status' => 'archived',
+        ]);
+    }
+
 }

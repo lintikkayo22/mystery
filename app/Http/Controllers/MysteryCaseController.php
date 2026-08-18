@@ -79,4 +79,44 @@ class MysteryCaseController extends Controller
         return response()->noContent();
     }
 
+    public function publish(MysteryCase $mysteryCase)
+    {
+        if (! auth()->user()->isAdmin()) {
+            abort(403);
+        }
+
+        if ($mysteryCase->status !== 'draft') {
+            abort(403);
+        }
+
+        $mysteryCase->update([
+            'status' => 'published',
+        ]);
+
+        return response()->json([
+            'message' => 'Mystery case published successfully.',
+            'data' => $mysteryCase->fresh(),
+        ]);
+    }
+
+    public function archive(MysteryCase $mysteryCase)
+    {
+        if (! auth()->user()->isAdmin()) {
+            abort(403);
+        }
+
+        if ($mysteryCase->status !== 'published') {
+            abort(403);
+        }
+
+        $mysteryCase->update([
+            'status' => 'archived',
+        ]);
+
+        return response()->json([
+            'message' => 'Mystery case archived successfully.',
+            'data' => $mysteryCase->fresh(),
+        ]);
+    }
+
 }

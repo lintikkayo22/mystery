@@ -61,6 +61,14 @@ Route::middleware(['auth'])->group(function () {
         MysteryCaseController::class,
         'destroy',
     ]);
+    Route::post('/mystery-cases/{mysteryCase}/publish', [
+        MysteryCaseController::class,
+        'publish',
+    ]);
+    Route::post('/mystery-cases/{mysteryCase}/archive', [
+        MysteryCaseController::class,
+        'archive',
+    ]);
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {
