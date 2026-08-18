@@ -8,6 +8,7 @@ use Inertia\Inertia;
 
 use App\Http\Controllers\MysteryCaseController;
 use App\Http\Controllers\ClueController;
+use App\Http\Controllers\EvidenceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -105,7 +106,16 @@ Route::middleware(['auth', 'admin'])->group(function () {
 });
 
 
-
+Route::get('/mystery-cases/{mysteryCase}/evidence', [EvidenceController::class,'index'])
+    ->middleware(['auth', 'admin']);
+Route::post('/mystery-cases/{mysteryCase}/evidence', [EvidenceController::class, 'store'])
+    ->middleware(['auth', 'admin']);
+Route::get('/mystery-cases/{mysteryCase}/evidence/{evidence}', [EvidenceController::class,'show']) 
+    ->middleware(['auth', 'admin']);
+Route::put('/mystery-cases/{mysteryCase}/evidence/{evidence}', [EvidenceController::class,'update'])
+    ->middleware(['auth', 'admin']);
+Route::delete('/mystery-cases/{mysteryCase}/evidence/{evidence}', [EvidenceController::class,'destroy'])
+    ->middleware(['auth', 'admin']);
 
 
 
