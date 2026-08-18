@@ -7,6 +7,7 @@ use Inertia\Inertia;
 
 
 use App\Http\Controllers\MysteryCaseController;
+use App\Http\Controllers\ClueController;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,6 +69,31 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/mystery-cases/{mysteryCase}/archive', [
         MysteryCaseController::class,
         'archive',
+    ]);
+
+    Route::post('/mystery-cases/{mysteryCase}/clues', [
+        ClueController::class,
+        'store',
+    ]);
+    Route::get('/mystery-cases/{mysteryCase}/clues', [
+        ClueController::class,
+        'index',
+    ]);
+    Route::get('/clues/{clue}', [
+        ClueController::class,
+        'show',
+    ]);
+    Route::put('/clues/{clue}', [
+        ClueController::class,
+        'update',
+    ]);
+    Route::delete('/clues/{clue}', [
+        ClueController::class,
+        'destroy',
+    ]);
+    Route::post('/clues/{clue}/reveal', [
+        ClueController::class,
+        'reveal',
     ]);
 });
 
