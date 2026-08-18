@@ -134,4 +134,328 @@ class MysteryCaseTest extends TestCase
         $response->assertSessionHasErrors('slug');
     }
 
+    public function test_investigator_can_only_see_published_mystery_cases(): void
+    {
+        $investigatorRole = Role::where('name', 'investigator')->firstOrFail();
+
+        $investigator = User::factory()->create([
+            'role_id' => $investigatorRole->id,
+        ]);
+
+        MysteryCase::factory()->published()->create([
+            'title' => 'Published Case',
+        ]);
+
+        MysteryCase::factory()->create([
+            'title' => 'Draft Case',
+        ]);
+
+        $response = $this->actingAs($investigator)
+            ->get('/mystery-cases');
+
+        $response->assertOk();
+
+        $response->assertJsonCount(1, 'data');
+
+        $response->assertJsonFragment([
+            'title' => 'Published Case',
+        ]);
+
+        $response->assertJsonMissing([
+            'title' => 'Draft Case',
+        ]);
+    }
+
+    public function test_admin_can_see_all_mystery_cases(): void
+    {
+        $adminRole = Role::where('name', 'admin')->firstOrFail();
+
+        $admin = User::factory()->create([
+            'role_id' => $adminRole->id,
+        ]);
+
+        MysteryCase::factory()->create([
+            'title' => 'Draft Case',
+        ]);
+
+        MysteryCase::factory()->published()->create([
+            'title' => 'Published Case',
+        ]);
+
+        MysteryCase::factory()->archived()->create([
+            'title' => 'Archived Case',
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->get('/mystery-cases');
+
+        $response->assertOk();
+
+        $response->assertJsonCount(3, 'data');
+
+        $response->assertJsonFragment([
+            'title' => 'Draft Case',
+        ]);
+
+        $response->assertJsonFragment([
+            'title' => 'Published Case',
+        ]);
+
+        $response->assertJsonFragment([
+            'title' => 'Archived Case',
+        ]);
+    }
+
+    public function test_investigator_can_view_published_mystery_case(): void
+    {
+        $investigatorRole = Role::where('name', 'investigator')->firstOrFail();
+
+        $investigator = User::factory()->create([
+            'role_id' => $investigatorRole->id,
+        ]);
+
+        $mysteryCase = MysteryCase::factory()
+            ->published()
+            ->create();
+
+        $response = $this->actingAs($investigator)
+            ->get("/mystery-cases/{$mysteryCase->id}");
+
+        $response->assertOk();
+
+        $response->assertJsonFragment([
+            'id' => $mysteryCase->id,
+            'title' => $mysteryCase->title,
+        ]);
+    }
+
+    public function test_investigator_cannot_view_draft_mystery_case(): void
+    {
+        $investigatorRole = Role::where('name', 'investigator')->firstOrFail();
+
+        $investigator = User::factory()->create([
+            'role_id' => $investigatorRole->id,
+        ]);
+
+        $mysteryCase = MysteryCase::factory()->create();
+
+        $response = $this->actingAs($investigator)
+            ->get("/mystery-cases/{$mysteryCase->id}");
+
+        $response->assertForbidden();
+    }
+
+    public function test_investigator_cannot_view_archived_mystery_case(): void
+    {
+        $investigatorRole = Role::where('name', 'investigator')->firstOrFail();
+
+        $investigator = User::factory()->create([
+            'role_id' => $investigatorRole->id,
+        ]);
+
+        $mysteryCase = MysteryCase::factory()
+            ->archived()
+            ->create();
+
+        $response = $this->actingAs($investigator)
+            ->get("/mystery-cases/{$mysteryCase->id}");
+
+        $response->assertForbidden();
+    }
+
+    public function test_admin_can_view_any_mystery_case(): void
+    {
+        $adminRole = Role::where('name', 'admin')->firstOrFail();
+
+        $admin = User::factory()->create([
+            'role_id' => $adminRole->id,
+        ]);
+
+        $statuses = ['draft', 'published', 'archived'];
+
+        foreach ($statuses as $status) {
+            $mysteryCase = MysteryCase::factory()->create([
+                'status' => $status,
+            ]);
+
+            $response = $this->actingAs($admin)
+                ->get("/mystery-cases/{$mysteryCase->id}");
+
+            $response->assertOk();
+
+            $response->assertJsonFragment([
+                'id' => $mysteryCase->id,
+                'title' => $mysteryCase->title,
+            ]);
+        }
+    }
+
+    public function test_admin_can_update_mystery_case(): void
+    {
+        $adminRole = Role::where('name', 'admin')->firstOrFail();
+
+        $admin = User::factory()->create([
+            'role_id' => $adminRole->id,
+        ]);
+
+        $mysteryCase = MysteryCase::factory()->create([
+            'title' => 'Old Title',
+            'slug' => 'old-title',
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->put("/mystery-cases/{$mysteryCase->id}", [
+                'title' => 'Updated Title',
+                'slug' => 'updated-title',
+                'description' => 'Updated description.',
+                'cover_image' => 'https://example.com/updated.jpg',
+                'difficulty' => 'hard',
+                'status' => 'published',
+            ]);
+
+        $response->assertOk();
+
+        $this->assertDatabaseHas('mystery_cases', [
+            'id' => $mysteryCase->id,
+            'title' => 'Updated Title',
+            'slug' => 'updated-title',
+            'difficulty' => 'hard',
+            'status' => 'published',
+        ]);
+    }
+
+    public function test_investigator_cannot_update_mystery_case(): void
+    {
+        $investigatorRole = Role::where('name', 'investigator')->firstOrFail();
+
+        $investigator = User::factory()->create([
+            'role_id' => $investigatorRole->id,
+        ]);
+
+        $mysteryCase = MysteryCase::factory()->create();
+
+        $response = $this->actingAs($investigator)
+            ->put("/mystery-cases/{$mysteryCase->id}", [
+                'title' => 'Updated Title',
+                'slug' => 'updated-title',
+                'description' => 'Updated description.',
+                'difficulty' => 'hard',
+                'status' => 'published',
+            ]);
+
+        $response->assertForbidden();
+    }
+
+    public function test_mystery_case_can_keep_its_existing_slug_when_updated(): void
+    {
+        $adminRole = Role::where('name', 'admin')->firstOrFail();
+
+        $admin = User::factory()->create([
+            'role_id' => $adminRole->id,
+        ]);
+
+        $mysteryCase = MysteryCase::factory()->create([
+            'slug' => 'original-slug',
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->put("/mystery-cases/{$mysteryCase->id}", [
+                'title' => 'Updated Title',
+                'slug' => 'original-slug',
+                'description' => 'Updated description.',
+                'difficulty' => 'medium',
+                'status' => 'draft',
+            ]);
+
+        $response->assertOk();
+
+        $this->assertDatabaseHas('mystery_cases', [
+            'id' => $mysteryCase->id,
+            'slug' => 'original-slug',
+            'title' => 'Updated Title',
+        ]);
+    }
+
+    public function test_admin_can_delete_draft_mystery_case(): void
+    {
+        $adminRole = Role::where('name', 'admin')->firstOrFail();
+
+        $admin = User::factory()->create([
+            'role_id' => $adminRole->id,
+        ]);
+
+        $mysteryCase = MysteryCase::factory()->create([
+            'status' => 'draft',
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->delete("/mystery-cases/{$mysteryCase->id}");
+
+        $response->assertNoContent();
+
+        $this->assertDatabaseMissing('mystery_cases', [
+            'id' => $mysteryCase->id,
+        ]);
+    }
+
+    public function test_admin_can_delete_archived_mystery_case(): void
+    {
+        $adminRole = Role::where('name', 'admin')->firstOrFail();
+
+        $admin = User::factory()->create([
+            'role_id' => $adminRole->id,
+        ]);
+
+        $mysteryCase = MysteryCase::factory()->archived()->create();
+
+        $response = $this->actingAs($admin)
+            ->delete("/mystery-cases/{$mysteryCase->id}");
+
+        $response->assertNoContent();
+
+        $this->assertDatabaseMissing('mystery_cases', [
+            'id' => $mysteryCase->id,
+        ]);
+    }
+
+    public function test_admin_cannot_delete_published_mystery_case(): void
+    {
+        $adminRole = Role::where('name', 'admin')->firstOrFail();
+
+        $admin = User::factory()->create([
+            'role_id' => $adminRole->id,
+        ]);
+
+        $mysteryCase = MysteryCase::factory()->published()->create();
+
+        $response = $this->actingAs($admin)
+            ->delete("/mystery-cases/{$mysteryCase->id}");
+
+        $response->assertForbidden();
+
+        $this->assertDatabaseHas('mystery_cases', [
+            'id' => $mysteryCase->id,
+        ]);
+    }
+
+    public function test_investigator_cannot_delete_mystery_case(): void
+    {
+        $investigatorRole = Role::where('name', 'investigator')->firstOrFail();
+
+        $investigator = User::factory()->create([
+            'role_id' => $investigatorRole->id,
+        ]);
+
+        $mysteryCase = MysteryCase::factory()->create();
+
+        $response = $this->actingAs($investigator)
+            ->delete("/mystery-cases/{$mysteryCase->id}");
+
+        $response->assertForbidden();
+
+        $this->assertDatabaseHas('mystery_cases', [
+            'id' => $mysteryCase->id,
+        ]);
+    }
+
 }

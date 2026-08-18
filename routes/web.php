@@ -44,7 +44,24 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-
+Route::middleware(['auth'])->group(function () {
+    Route::get('/mystery-cases', [
+        MysteryCaseController::class,
+        'index',
+    ]);
+    Route::get('/mystery-cases/{mysteryCase}', [
+        MysteryCaseController::class,
+        'show',
+    ]);
+    Route::put('/mystery-cases/{mysteryCase}', [
+        MysteryCaseController::class,
+        'update',
+    ]);
+    Route::delete('/mystery-cases/{mysteryCase}', [
+        MysteryCaseController::class,
+        'destroy',
+    ]);
+});
 
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/mystery-cases', [
@@ -52,6 +69,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
         'store',
     ]);
 });
+
 
 
 
