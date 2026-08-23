@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Clue;
+use App\Models\Evidence;
+use App\Models\Chapter;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MysteryCase extends Model
@@ -30,4 +32,8 @@ class MysteryCase extends Model
         return $this->hasMany(Evidence::class);
     }
 
+    public function chapters(): HasMany
+    {
+        return $this->hasMany(Chapter::class);
+    }
 }

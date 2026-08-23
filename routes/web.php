@@ -9,6 +9,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\MysteryCaseController;
 use App\Http\Controllers\ClueController;
 use App\Http\Controllers\EvidenceController;
+use App\Http\Controllers\ChapterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -99,10 +100,13 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {
-    Route::post('/mystery-cases', [
-        MysteryCaseController::class,
-        'store',
-    ]);
+    Route::post('/mystery-cases', [MysteryCaseController::class,'store']);
+    Route::get('/mystery-cases', [MysteryCaseController::class,'index']);
+    Route::get('/mystery-case/{mysteryCase}', [MysteryCaseController::class,'show']);
+    Route::put('/mystery-cases/{mysteryCase}', [MysteryCaseController::class,'update']);
+    Route::delete('/mystery-cases/{mysteryCase}', [MysteryCaseController::class,'destroy']);
+    Route::post('/mystery-cases/{mysteryCase}/publish', [MysteryCaseController::class,'publish']);
+    Route::post('/mystery-cases/{mysteryCase}/archive', [MysteryCaseController::class,'archive']);
 });
 
 
@@ -117,6 +121,20 @@ Route::put('/mystery-cases/{mysteryCase}/evidence/{evidence}', [EvidenceControll
 Route::delete('/mystery-cases/{mysteryCase}/evidence/{evidence}', [EvidenceController::class,'destroy'])
     ->middleware(['auth', 'admin']);
 
+
+
+
+
+
+  
+Route::post('/mystery-cases/{mysteryCase}/chapters',[ChapterController::class, 'store'])
+    ->middleware(['auth', 'admin']);
+Route::get('/mystery-cases/{mysteryCase}/chapters/{chapter}', [ChapterController::class, 'show'])
+    ->middleware(['auth', 'admin']);
+Route::put('/mystery-cases/{mysteryCase}/chapters/{chapter}', [ChapterController::class, 'update'])
+    ->middleware(['auth', 'admin']);
+Route::delete('/mystery-cases/{mysteryCase}/chapters/{chapter}', [ChapterController::class, 'destroy'])
+    ->middleware(['auth', 'admin']);
 
 
 
