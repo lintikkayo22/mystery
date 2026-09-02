@@ -10,6 +10,7 @@ use App\Http\Controllers\MysteryCaseController;
 use App\Http\Controllers\ClueController;
 use App\Http\Controllers\EvidenceController;
 use App\Http\Controllers\ChapterController;
+use App\Http\Controllers\SceneController;
 
 /*
 |--------------------------------------------------------------------------
@@ -134,6 +135,16 @@ Route::get('/mystery-cases/{mysteryCase}/chapters/{chapter}', [ChapterController
 Route::put('/mystery-cases/{mysteryCase}/chapters/{chapter}', [ChapterController::class, 'update'])
     ->middleware(['auth', 'admin']);
 Route::delete('/mystery-cases/{mysteryCase}/chapters/{chapter}', [ChapterController::class, 'destroy'])
+    ->middleware(['auth', 'admin']);
+
+
+Route::post('/chapters/{chapter}/scenes',[SceneController::class, 'store'])
+    ->middleware(['auth', 'admin']);
+Route::get('/chapters/{chapter}/scenes/{scene}', [SceneController::class, 'show'])
+    ->middleware(['auth', 'admin']);
+Route::put('/chapters/{chapter}/scenes/{scene}', [SceneController::class, 'update'])
+    ->middleware(['auth', 'admin']);
+Route::delete('/chapters/{chapter}/scenes/{scene}', [SceneController::class, 'destroy'])
     ->middleware(['auth', 'admin']);
 
 
