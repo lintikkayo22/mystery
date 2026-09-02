@@ -4,27 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\MysteryCase;
-use App\Models\Scene;
 
-class Chapter extends Model
+class Scene extends Model
 {
     use HasFactory;
 
     protected $fillable = [
+        'chapter_id',
         'title',
         'description',
         'order',
         'status',
     ];
 
-    public function mysteryCase()
+    public function chapter()
     {
-        return $this->belongsTo(MysteryCase::class);
-    }
-
-    public function scenes()
-    {
-        return $this->hasMany(Scene::class);
+        return $this->belongsTo(Chapter::class);
     }
 }
