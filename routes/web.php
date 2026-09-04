@@ -148,5 +148,15 @@ Route::delete('/chapters/{chapter}/scenes/{scene}', [SceneController::class, 'de
     ->middleware(['auth', 'admin']);
 
 
+Route::get('/scenes/{scene}/interactables', [App\Http\Controllers\InteractableController::class, 'index'])
+    ->middleware(['auth', 'admin']);
+Route::post('/scenes/{scene}/interactables', [App\Http\Controllers\InteractableController::class, 'store'])
+    ->middleware(['auth', 'admin']);
+Route::get('/scenes/{scene}/interactables/{interactable}', [App\Http\Controllers\InteractableController::class, 'show'])
+    ->middleware(['auth', 'admin']);
+Route::put('/scenes/{scene}/interactables/{interactable}', [App\Http\Controllers\InteractableController::class, 'update'])
+    ->middleware(['auth', 'admin']);
+Route::delete('/scenes/{scene}/interactables/{interactable}', [App\Http\Controllers\InteractableController::class, 'destroy'])
+    ->middleware(['auth', 'admin']);
 
 require __DIR__.'/auth.php';
