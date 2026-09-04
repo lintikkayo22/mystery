@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Chapter;
+use App\Models\Interactable;
 
 class Scene extends Model
 {
@@ -20,5 +22,10 @@ class Scene extends Model
     public function chapter()
     {
         return $this->belongsTo(Chapter::class);
+    }
+
+    public function interactables()
+    {
+        return $this->hasMany(Interactable::class);
     }
 }
