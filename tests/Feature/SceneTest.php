@@ -582,4 +582,41 @@ class SceneTest extends TestCase
         ]);
     }
 
+    public function test_scene_can_store_background_image(): void
+    {
+        $chapter = Chapter::factory()->create();
+
+        $scene = Scene::create([
+            'chapter_id' => $chapter->id,
+            'title' => 'Phòng tân hôn',
+            'description' => 'Một căn phòng cũ.',
+            'background_image' => 'scenes/bedroom.jpg',
+            'order' => 1,
+            'status' => 'draft',
+        ]);
+
+        $this->assertDatabaseHas('scenes', [
+            'id' => $scene->id,
+            'background_image' => 'scenes/bedroom.jpg',
+        ]);
+    }
+
+    public function test_scene_can_be_created_without_background_image(): void
+    {
+        $chapter = Chapter::factory()->create();
+
+        $scene = Scene::create([
+            'chapter_id' => $chapter->id,
+            'title' => 'Phòng tân hôn',
+            'description' => 'Một căn phòng cũ.',
+            'order' => 1,
+            'status' => 'draft',
+        ]);
+
+        $this->assertDatabaseHas('scenes', [
+            'id' => $scene->id,
+            'background_image' => null,
+        ]);
+    }
+
 }
