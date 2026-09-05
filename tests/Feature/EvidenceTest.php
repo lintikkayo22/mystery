@@ -441,4 +441,23 @@ class EvidenceTest extends TestCase
         ]);
     }
 
+    public function test_evidence_can_store_file_path(): void
+    {
+        $mysteryCase = MysteryCase::factory()->create();
+
+        $evidence = Evidence::create([
+            'mystery_case_id' => $mysteryCase->id,
+            'title' => 'Ảnh cưới',
+            'description' => 'Một bức ảnh cũ.',
+            'type' => 'image',
+            'file_path' => 'evidence/photo-001.jpg',
+            'is_revealed' => false,
+        ]);
+
+        $this->assertDatabaseHas('evidence', [
+            'id' => $evidence->id,
+            'file_path' => 'evidence/photo-001.jpg',
+        ]);
+    }
+
 }

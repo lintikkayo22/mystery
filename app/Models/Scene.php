@@ -15,6 +15,7 @@ class Scene extends Model
         'chapter_id',
         'title',
         'description',
+        'background_image',
         'order',
         'status',
     ];
