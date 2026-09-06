@@ -62,4 +62,9 @@ class User extends Authenticatable
     {
         return $this->role?->name === 'investigator';
     }
+
+    public function gameProgress(): HasMany
+    {
+        return $this->hasMany(PlayerGameProgress::class);
+    }
 }
