@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PlayerGameProgress extends Model
 {
@@ -35,5 +36,10 @@ class PlayerGameProgress extends Model
     public function currentScene(): BelongsTo
     {
         return $this->belongsTo(Scene::class, 'current_scene_id');
+    }
+
+    public function inventory(): HasMany
+    {
+        return $this->hasMany(PlayerInventory::class);
     }
 }
