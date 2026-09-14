@@ -27,14 +27,6 @@ class ClueFactory extends Factory
                 'statement',
                 'location',
             ]),
-            'is_revealed' => false,
         ];
-    }
-
-    public function revealed(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'is_revealed' => true,
-        ]);
     }
 }

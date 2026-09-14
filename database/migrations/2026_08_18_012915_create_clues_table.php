@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('title');
             $table->text('content');
             $table->string('type');
-            $table->boolean('is_revealed')->default(false);
             $table->timestamps();
         });
     }
