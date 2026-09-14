@@ -27,8 +27,6 @@ class EvidenceFactory extends Factory
                 'audio',
                 'document',
             ]),
-            'file_path' => null,
-            'is_revealed' => false,
         ];
     }
 

@@ -11,17 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('evidence', function (Blueprint $table) {
+        Schema::create('interactions', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('mystery_case_id')
-                ->constrained()
-                ->onDelete('cascade');
+            $table->string('name');
+            $table->text('description')->nullable();
 
-            $table->string('title');
-            $table->text('description');
-            $table->string('type');
-            $table->string('file_path')->nullable();
+            $table->boolean('is_active')->default(true);
 
             $table->timestamps();
         });
@@ -32,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('evidence');
+        Schema::dropIfExists('interactions');
     }
 };
